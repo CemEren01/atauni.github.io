@@ -318,7 +318,7 @@ const DATA = {
             <div class="relative flex justify-between items-center px-2">
                 <div class="absolute left-4 right-4 top-1/2 h-0.5 bg-gray-200 dark:bg-slate-700 -z-0 rounded"></div>
                 
-                ${[1,2,3,4,5,6,7].map(num => `
+                ${[1,2,3,4,5,6,7,8].map(num => `
                     <button onclick="openGallery(${num-1})" class="relative z-10 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 transform hover:scale-125 bg-white dark:bg-slate-800 border-2 border-sky-500 text-sky-700 dark:text-sky-400 shadow-md hover:bg-sky-500 hover:text-white dark:hover:bg-sky-500 dark:hover:text-white group">
                         ${num}
                     </button>
@@ -786,6 +786,7 @@ document.addEventListener('keydown', (e) => {
 </script>
 </body>
 </html>
+
 
 
 
