@@ -179,14 +179,16 @@
       </footer>
   </div>
 
-  <div id="gallery-modal" class="fixed inset-0 z-[100] hidden bg-black/95 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 transition-opacity duration-300 opacity-0" onclick="closeGallery(event)">
+<div id="gallery-modal" class="fixed inset-0 z-[100] hidden bg-black/95 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 transition-opacity duration-300 opacity-0" onclick="closeGallery(event)">
     <div class="relative max-w-[95vw] w-full flex flex-col items-center">
         
         <button onclick="closeGallery(null, true)" class="absolute -top-10 -right-2 md:-right-10 text-white hover:text-red-400 transition-colors p-2 z-50 bg-black/20 rounded-full">
             <i data-lucide="x" class="w-6 h-6 md:w-8 md:h-8"></i>
         </button>
 
-        <img id="modal-img" src="" class="rounded-lg shadow-2xl max-h-[90vh] max-w-full w-auto h-auto object-contain border-2 border-white/10 bg-black" onclick="event.stopPropagation()">
+        <img id="modal-img" src="" class="hidden rounded-lg shadow-2xl max-h-[90vh] max-w-full w-auto h-auto object-contain border-2 border-white/10 bg-black" onclick="event.stopPropagation()">
+        
+        <iframe id="modal-pdf" src="" class="hidden w-full md:w-[800px] h-[80vh] rounded-lg shadow-2xl bg-white border-2 border-white/10" onclick="event.stopPropagation()"></iframe>
         
         <div id="modal-caption" class="mt-3 text-white text-sm md:text-base text-center font-medium bg-white/10 px-6 py-2 rounded-full backdrop-blur-md border border-white/10">
             </div>
@@ -706,23 +708,29 @@ document.getElementById("btn-prev").onclick = () => {
 /* INITIALIZATION */
 lucide.createIcons();
 /* =========================================
-   GALLERY MODAL LOGIC
+/* =========================================
+   GALLERY MODAL LOGIC (Updated for PDF support)
    ========================================= */
 
-// Placeholder Images - Replace with your real screenshots
+// UPDATED DATA: Step 6 is now a PDF example
 const GALLERY_STEPS = [
-    { src: "1.jpg", text: "1. OBS'ye girdikten sonra Başvuru İşlemleri -> Kayıt başvuruları butonuna tıklayınız." },
-    { src: "2.jpg", text: "2. Açılan saydada Staj Başvurusu butonuna tıklayın." },
-    { src: "3.jpg", text: "3. Ekranda çıkan sayfadaki boş bilgileri  doldurup , Ön Başvuru Yap butonuna tıklayınız." },
-    { src: "4.jpg", text: "4. Staj belgeniz ilgili firma tarfından onaylandıkdan sonra , turuncu butona tıklayınız." },
-    { src: "ön basvuru form 1 5.pdf", text: "5. 'Kaydet' butonuna basarak işlemi tamamlayınız." },
-    { src: "6.jpg", text: "6. Resmi başvuruyu tamamlamak için yeşil butona basınız." },
-    { src: "7.jpg", text: "7. Karşınıza Zorunlu Staj Belgesi çıkdıktan sonra , bu belgeyi yazdırıp resimdeki sıralama ile yekili birimlere imzalatınız." }
+    { type: 'img', src: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80", text: "1. OBS Giriş Ekranı: Kullanıcı bilgilerinizi giriniz." },
+    { type: 'img', src: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=800&q=80", text: "2. Menüden 'Staj İşlemleri' sekmesini seçiniz." },
+    { type: 'img', src: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80", text: "3. Sağ üst köşedeki 'Yeni Başvuru' butonuna tıklayınız." },
+    { type: 'img', src: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=80", text: "4. Firma ve tarih bilgilerini doldurunuz." },
+    { type: 'img', src: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80", text: "5. 'Kaydet' butonuna basarak işlemi tamamlayınız." },
+    
+    // *** PDF EXAMPLE HERE (Step 6) ***
+    // Replace the 'src' below with your actual PDF link
+    { type: 'pdf', src: "http://birimler.atauni.edu.tr/uygulamali-bilimler-fakultesi/wp-content/uploads/sites/225/2020/07/ek-1-zorunlu-staj-formu.doc", text: "6. ÖRNEK FORM: Bu formun çıktısını alınız." },
+    
+    { type: 'img', src: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=800&q=80", text: "7. Islak imza süreçlerini tamamlayıp yükleyiniz." }
 ];
 
 let currentModalIndex = 0;
 const modalEl = document.getElementById("gallery-modal");
 const modalImg = document.getElementById("modal-img");
+const modalPdf = document.getElementById("modal-pdf"); // New Element
 const modalCap = document.getElementById("modal-caption");
 
 function openGallery(index) {
@@ -731,25 +739,24 @@ function openGallery(index) {
     
     // Show Modal
     modalEl.classList.remove("hidden");
-    // Small delay to allow CSS transition to work
     setTimeout(() => {
         modalEl.classList.remove("opacity-0");
     }, 10);
 }
 
 function closeGallery(e, force = false) {
-    // Close only if clicked on background or close button (not image)
     if (force || e.target === modalEl) {
         modalEl.classList.add("opacity-0");
         setTimeout(() => {
             modalEl.classList.add("hidden");
+            // Reset sources to stop PDF/Video from playing in background
+            modalPdf.src = "";
         }, 300);
     }
 }
 
 function changeModalSlide(direction) {
     currentModalIndex += direction;
-    // Loop navigation
     if (currentModalIndex >= GALLERY_STEPS.length) currentModalIndex = 0;
     if (currentModalIndex < 0) currentModalIndex = GALLERY_STEPS.length - 1;
     updateModalContent();
@@ -757,14 +764,24 @@ function changeModalSlide(direction) {
 
 function updateModalContent() {
     const data = GALLERY_STEPS[currentModalIndex];
-    modalImg.src = data.src;
     modalCap.textContent = data.text;
+
+    if (data.type === 'pdf') {
+        // Hide Image, Show PDF
+        modalImg.classList.add("hidden");
+        modalPdf.classList.remove("hidden");
+        modalPdf.src = data.src;
+    } else {
+        // Show Image, Hide PDF
+        modalPdf.classList.add("hidden");
+        modalImg.classList.remove("hidden");
+        modalImg.src = data.src;
+    }
 }
 
-// Add Keyboard Support (Left/Right/Esc)
+// Add Keyboard Support
 document.addEventListener('keydown', (e) => {
     if (modalEl.classList.contains('hidden')) return;
-    
     if (e.key === "Escape") closeGallery(null, true);
     if (e.key === "ArrowRight") changeModalSlide(1);
     if (e.key === "ArrowLeft") changeModalSlide(-1);
@@ -772,6 +789,7 @@ document.addEventListener('keydown', (e) => {
 </script>
 </body>
 </html>
+
 
 
 
